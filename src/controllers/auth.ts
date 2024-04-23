@@ -1,5 +1,82 @@
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
+import bcrypt from 'bcrypt'
+import { SALT_ROUNDS } from '../secrets'
+import { PrismaClient, Prisma } from '@prisma/client'
+import { BadRequestsException } from '../exceptions/bad-requests'
+import { ErrorCode } from '../exceptions/root'
+import { UserToken } from '../lib/token-generator'
 
-export const signup = (req: Request, res: Response) => {
-  res.send('Route /api/auth/signup works')
+const prisma = new PrismaClient();
+type UserResponse = { id: number, first_name: string, last_name: string, email: string, token: string}
+
+export const signup = async (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const { email, password, first_name, last_name } = req.body
+
+    const foundUser = await prisma.user.findFirst({
+      where: {
+        email: email
+      }
+    });
+
+    if(foundUser){
+      throw new BadRequestsException('User exists', ErrorCode.USER_ALREADY_EXISTS, 400)
+    }
+
+    const hash: string = await bcrypt.hash(password, parseInt(SALT_ROUNDS || '10'))
+    let user: Prisma.UserCreateInput = {
+      firstName: first_name,
+      lastName: last_name,
+      email: email,
+      password: hash
+    };
+
+    const createdUser = await prisma.user.create({ data: user })
+
+    const userResponse: UserResponse = {
+      id: createdUser.id,
+      first_name: createdUser.firstName,
+      last_name: createdUser.lastName,
+      email: createdUser.email,
+      token: UserToken(createdUser.id)
+    }
+
+    res.send(userResponse)
+  }catch(error){
+    next(error)
+  }
+};
+
+export const signin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, password } = req.body
+    const foundUser = await prisma.user.findFirst({
+      where: {
+        email: email
+      }
+    });
+
+    if(!foundUser){
+      throw new BadRequestsException('User not found', ErrorCode.USER_NOT_FOUND, 404);
+    }
+
+    const passwordMatches: boolean = await bcrypt.compare(password, foundUser.password);
+
+    if(!passwordMatches){
+      throw new BadRequestsException('Password mismatch', ErrorCode.INCORRECT_PASSWORD, 400);
+    }
+
+    const userResponse: UserResponse = {
+      id: foundUser.id,
+      first_name: foundUser.firstName,
+      last_name: foundUser.lastName,
+      email: foundUser.email,
+      token: UserToken(foundUser.id)
+    }
+
+    res.send(userResponse);
+
+  } catch (error) {
+    next(error);
+  }
 };
