@@ -1,6 +1,6 @@
 # Express-API
 
-`Express`, `TypeScript`, `MySQL` based API which supports Authentication endpoints
+`Node.js`, `Express.js`, `TypeScript`, `MySQL` based RESTful API which supports Authentication endpoints
 
 ## Build Code
 
