@@ -13,3 +13,5 @@ app.use(ErrorHandler)
 app.listen(PORT, () => {
   console.log(`Listening on ${PORT}`);
 });
+
+export default app;
