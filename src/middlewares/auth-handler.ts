@@ -2,40 +2,61 @@ import { NextFunction, Request, Response } from "express";
 import { BadRequestsException } from "../exceptions/bad-requests";
 import { ErrorCode } from "../exceptions/root";
 import { UserId } from "../lib/token-generator";
-import { Prisma, PrismaClient } from "@prisma/client";
-import { JwtPayload } from "jsonwebtoken";
-import { string } from "zod";
+import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient()
+class AuthHandler
+{
+  private prisma: PrismaClient;
 
-export const AuthHandler = async (req: Request, res: Response, next: NextFunction) => {
-  try{
-    const authToken = req.headers.authorization;
+  constructor(){
+    this.prisma = new PrismaClient()
 
-    if(!authToken){
-      throw new BadRequestsException('Authentication failed', ErrorCode.AUTHENTICATION_ERROR, 400);
+    this.authUser = this.authUser.bind(this);
+    this.getUser = this.getUser.bind(this);
+  }
+
+  private async getUser(authorization: string | undefined){
+    
+    if(!authorization){
+      throw new BadRequestsException('Authention failed.', ErrorCode.AUTHENTICATION_ERROR, 400);
     }
 
-    const userId: number | null = await UserId(authToken);
+    const userId: number | null = await UserId(authorization);
 
     if(userId === null){
-      throw new BadRequestsException('Authentication failed', ErrorCode.AUTHENTICATION_ERROR, 400);
+      throw new BadRequestsException('Authentication failed.', ErrorCode.AUTHENTICATION_ERROR, 400);
     }
 
-    const user = await prisma.user.findFirst({
+    const user = await this.prisma.user.findFirst({
       where: {
         id: userId!
       }
     })
 
     if(!user){
-      throw new BadRequestsException('Authentication failed', ErrorCode.AUTHENTICATION_ERROR, 400);
+      throw new BadRequestsException('Authentication failed.', ErrorCode.AUTHENTICATION_ERROR, 400);
     }
 
-    req.body.user = user;
+    return user;
 
-    next();
-  }catch(error){
-    next(error);
   }
-};
+
+  public async authUser(req: Request, res: Response, next: NextFunction)
+  {
+    try{
+      const user = await this.getUser(req.headers.authorization)
+  
+      if(!user){
+        throw new BadRequestsException('Authentication failed.', ErrorCode.AUTHENTICATION_ERROR, 400);
+      }
+
+      req.body.user = user;
+  
+      next();
+    }catch(error){
+      next(error);
+    }
+  }
+}
+
+export default AuthHandler;
