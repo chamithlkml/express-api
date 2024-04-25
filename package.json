@@ -52,6 +52,7 @@
     "pino": "^8.20.0",
     "pino-pretty": "^11.0.0",
     "reflect-metadata": "^0.2.2",
-    "winston": "^3.13.0"
+    "winston": "^3.13.0",
+    "zod": "^3.23.4"
   }
 }
