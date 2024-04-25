@@ -1,10 +1,17 @@
-import jwt from 'jsonwebtoken'
+import jwt, { JwtPayload } from 'jsonwebtoken'
 import { JWT_SECRET } from '../secrets';
 
 export const UserToken = (userId: number) => {
-  return jwt.sign({ userId: userId }, JWT_SECRET);
+  return jwt.sign({ userId: userId }, JWT_SECRET)
 };
 
-export const DecodeToken = (token: string) => {
-  return jwt.verify(token, JWT_SECRET);
+export const UserId = async (token: string) => {
+  try{
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userId = typeof decoded === 'string' ? null : decoded.userId;
+
+    return userId;
+  }catch(error){
+    throw new Error('Authentication error');
+  }
 };

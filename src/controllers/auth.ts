@@ -8,8 +8,9 @@ import { UserToken } from '../lib/token-generator'
 import { UserSchema, UserSignInSchema } from '../schemas/user-schema'
 
 const prisma = new PrismaClient();
-type UserResponse = { id: number, first_name: string, last_name: string, email: string, token: string}
+type UserResponse = { id: number, first_name: string, last_name: string, email: string, token?: string}
 
+// POST /api/auth/signup
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
   try{
     const userInputs = UserSchema.parse(req.body);
@@ -49,6 +50,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
+// POST /api/auth/signin
 export const signin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userInputs = UserSignInSchema.parse(req.body)
@@ -82,3 +84,21 @@ export const signin = async (req: Request, res: Response, next: NextFunction) =>
     next(error);
   }
 };
+
+// GET /api/auth/me
+export const me = (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const userObj = req.body.user;
+
+    const sessionUser = {
+      id: userObj.id,
+      first_name: userObj.firstName,
+      last_name: userObj.lastName,
+      email: userObj.email
+    } 
+
+    res.send(sessionUser);
+  }catch(error){
+    next(error)
+  }
+}
