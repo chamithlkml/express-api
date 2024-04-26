@@ -2,17 +2,17 @@ import { PrismaClient, Prisma } from '@prisma/client'
 import { UserToken } from '../../src/lib/token-generator';
 import { UserSchema } from '../../src/schemas/user-schema';
 
-export const AuthAdminContext = async (): Promise<string> => {
+export const AuthContext = async (role: 'ADMIN' | 'USER'): Promise<string> => {
   const prisma = new PrismaClient();
-  const adminUser = await prisma.user.findFirst({
+  const foundUser = await prisma.user.findFirst({
     where: {
-      role: 'ADMIN'
+      role: role
     }
   });
 
-  if(!adminUser){
-    throw new Error('No Admin user found')
+  if(!foundUser){
+    throw new Error(`User of type ${role} not found`)
   }
 
-  return UserToken(adminUser.id)
+  return UserToken(foundUser.id);
 }

@@ -2,12 +2,12 @@ import request from 'supertest'
 import { faker } from '@faker-js/faker'
 import should from 'should'
 import app from '../src/server'
-import { AuthAdminContext } from './shared/auth'
+import { AuthContext } from './shared/auth'
 
 let authToken = '';
 
 before(async () => {
-  authToken = await AuthAdminContext();
+  authToken = await AuthContext('ADMIN');
 })
 
 describe('POST /api/products', () => {
