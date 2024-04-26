@@ -11,7 +11,7 @@ let lastProductId: number;
 before(async () => {
   authToken = await AuthContext('ADMIN');
   lastProductId = await LastProductId();
-})
+});
 
 describe('POST /api/products', () => {
   it('Should create a product', (done) => {
@@ -20,7 +20,7 @@ describe('POST /api/products', () => {
       description: faker.company.name(),
       price: faker.number.int(),
       tags: faker.color.human()
-    }
+    };
 
     request(app)
       .post('/api/products')
@@ -33,9 +33,9 @@ describe('POST /api/products', () => {
         should(res.body).have.property('id').and.be.a.Number();
 
         done();
-      })
-  })
-})
+      });
+  });
+});
 
 describe('GET /api/products', () => {
   it('Should return an array of products', (done) => {
@@ -50,7 +50,7 @@ describe('GET /api/products', () => {
         should(res.body).have.property('products').and.be.an.Array();
         done();
       });
-  })
+  });
 });
 
 describe('PUT /api/products/:id', () => {
@@ -72,6 +72,23 @@ describe('PUT /api/products/:id', () => {
       should(res.body).have.property('id').and.be.a.Number();
 
       done();
-    })
+    });
+  });
+});
+
+describe('GET /api/products/:id', () => {
+  it('Should return the product', (done) => {
+    request(app)
+      .get(`/api/products/${lastProductId}`)
+      .set({Authorization: authToken})
+      .send()
+      .expect(200)
+      .end((err, res) => {
+        if(err) return done(err);
+
+        should(res.body).have.property('id').and.be.a.Number();
+
+        done();
+      })
   })
 });

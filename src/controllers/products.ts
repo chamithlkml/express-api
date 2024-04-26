@@ -39,6 +39,10 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
 
 export const updateProduct = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    if(!req.params.id){
+      throw new BadRequestsException('ID not found', ErrorCode.INVALID_INPUT_PARAMETER)
+    }
+
     const productId: number = parseInt(req.params.id, 10);
 
     const productUpdateData = UpdateProductSchema.parse(req.body);
@@ -53,5 +57,29 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
     res.json(updatedProduct);
   } catch (error) {
     next(error)
+  }
+};
+
+export const getProduct = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if(!req.params.id){
+      throw new BadRequestsException('ID not found', ErrorCode.INVALID_INPUT_PARAMETER)
+    }
+
+    const productId: number = parseInt(req.params.id, 10);
+    const foundProduct = await prisma.product.findUnique({
+      where: {
+        id: productId
+      }
+    });
+
+    if(!foundProduct){
+      throw new BadRequestsException('Product not found', ErrorCode.ITEM_NOT_FOUND, 400);
+    }
+
+    res.json(foundProduct);
+
+  } catch (error) {
+   next(error); 
   }
 };
