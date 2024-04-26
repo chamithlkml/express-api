@@ -19,7 +19,7 @@ class AuthHandler
   private async getUser(authorization: string | undefined){
     
     if(!authorization){
-      throw new BadRequestsException('Authention failed.', ErrorCode.AUTHENTICATION_ERROR, 400);
+      throw new BadRequestsException('Authentication failed.', ErrorCode.AUTHENTICATION_ERROR, 400);
     }
 
     const userId: number | null = await UserId(authorization);
