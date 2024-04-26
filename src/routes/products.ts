@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createProduct, getProduct, getProducts, updateProduct } from "../controllers/products";
+import { createProduct, deleteProduct, getProduct, getProducts, updateProduct } from "../controllers/products";
 import AuthHandler from "../middlewares/auth-handler";
 
 const productsRoutes: Router = Router();
@@ -9,6 +9,6 @@ productsRoutes.post('/', authHandler.authProducts, createProduct);
 productsRoutes.get('/', authHandler.authProducts, getProducts);
 productsRoutes.put('/:id', authHandler.authProducts, updateProduct);
 productsRoutes.get('/:id', authHandler.authProducts, getProduct);
-// productsRoutes.delete('/:id', deleteProduct)
+productsRoutes.delete('/:id', authHandler.authProducts, deleteProduct);
 
 export default productsRoutes;

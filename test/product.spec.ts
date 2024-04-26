@@ -92,3 +92,20 @@ describe('GET /api/products/:id', () => {
       })
   })
 });
+
+describe('DELETE /api/products/:id', () => {
+  it('Should delete the product', (done) => {
+    request(app)
+      .delete(`/api/products/${lastProductId}`)
+      .set({Authorization: authToken})
+      .send()
+      .expect(200)
+      .end((err, res) => {
+        if(err) return done(err);
+
+        should(res.body).have.property('id').and.be.a.Number();
+
+        done();
+      });
+  });
+});

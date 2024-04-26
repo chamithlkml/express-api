@@ -83,3 +83,24 @@ export const getProduct = async (req: Request, res: Response, next: NextFunction
    next(error); 
   }
 };
+
+export const deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if(!req.params.id){
+      throw new BadRequestsException('ID not found', ErrorCode.INVALID_INPUT_PARAMETER)
+    }
+    
+    const productId: number = parseInt(req.params.id, 10);
+
+    const deletedProduct = await prisma.product.delete({
+      where: {
+        id: productId
+      }
+    })
+
+    res.json(deletedProduct);
+
+  } catch (error) {
+    next(error);
+  }
+};
