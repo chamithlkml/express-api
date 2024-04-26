@@ -1,6 +1,5 @@
-import { PrismaClient, Prisma } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import { UserToken } from '../../src/lib/token-generator';
-import { UserSchema } from '../../src/schemas/user-schema';
 
 export const AuthContext = async (role: 'ADMIN' | 'USER'): Promise<string> => {
   const prisma = new PrismaClient();
