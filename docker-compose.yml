@@ -19,6 +19,7 @@ services:
       - '.:/app'
     depends_on:
       - mysql
+      - redis
   mysql:
     image: 'mysql/mysql-server:8.0'
     container_name: mysql
@@ -44,6 +45,13 @@ services:
             - '-p${DB_PASSWORD}'
         retries: 3
         timeout: 5s
+  redis:
+    image: 'redis'
+    container_name: redis
+    ports:
+      - 6379:6379
+    networks:
+      - express-api-net
 networks:
     express-api-net:
         driver: bridge
