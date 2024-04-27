@@ -27,6 +27,9 @@ model User {
   role        Role @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
+  defaultBillingAddress Int?
+  defaultDeliveryAddress Int?
+  addresses Address[]
 
   @@map("users")
 }
@@ -41,4 +44,19 @@ model Product {
   updatedAt DateTime @updatedAt
 
   @@map("products")
+}
+
+model Address {
+  id Int @id @default(autoincrement())
+  lineOne String
+  lineTwo String
+  city String
+  country String
+  postalCode String
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("addresses")
 }

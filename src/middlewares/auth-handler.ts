@@ -45,8 +45,14 @@ class AuthHandler
   public async authUser(req: Request, res: Response, next: NextFunction)
   {
     try{
-      req.body.user = await this.getUser(req.headers.authorization);
+      const user = await this.getUser(req.headers.authorization);
   
+      if(user.role != 'USER'){
+        throw new BadRequestsException('You are not authorised to perform this', ErrorCode.USER_NOT_ALLOWED, 401)
+      }
+
+      req.body.user = user; 
+      
       next();
     }catch(error){
       next(error);
@@ -59,7 +65,7 @@ class AuthHandler
       const user = await this.getUser(req.headers.authorization);
 
       if(user.role != 'ADMIN'){
-        throw new BadRequestsException('You are not authorised to perform this', ErrorCode.USER_NOT_ALLOWED, 400);
+        throw new BadRequestsException('You are not authorised to perform this', ErrorCode.USER_NOT_ALLOWED, 401);
       }
 
       req.body.user = user;

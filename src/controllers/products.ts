@@ -26,9 +26,11 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
       skip: (page - 1) * pageSize,
       take: pageSize
     });
+    const productCount = await prisma.product.count();
 
     res.json({
       products: products,
+      count: productCount,
       page: page,
       page_size: pageSize
     })

@@ -1,18 +1,18 @@
 import { Request, Response, NextFunction } from 'express'
 import logger from '../lib/logger';
 import { ErrorCode, HttpException } from '../exceptions/root';
-import { z } from 'zod'
+import { ZodError } from 'zod'
 import { Prisma } from '@prisma/client';
 
 const ErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
   console.log(err);
   logger.error(err);
 
-  if(err instanceof z.ZodError){
+  if(err instanceof ZodError){
     res.status(400).json({
       success: false,
       ErrorCode: ErrorCode.USER_INPUT_VALIDATION_FAILED,
-      message: JSON.stringify(err.issues),
+      message: 'Unprecessable Entity',
       errors: err.issues
     })
   }else if(err instanceof HttpException){
